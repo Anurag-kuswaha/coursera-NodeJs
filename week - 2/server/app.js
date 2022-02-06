@@ -3,7 +3,17 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const port = process.env.PORT || 5000;
+const mongoose = require('mongoose');
+const url = 'mongodb://localhost:27017/trial';
+const connect = mongoose.connect(url);
 
+connect.then( (db) =>{
+  console.log('connected to DB successfully');
+  //console.log(db);
+}).catch( (e) =>{
+  console.log('error in connection'+ e);
+})
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -46,5 +56,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
+app.listen(port, ()=>{
+  console.log(`app is listing on http://localhost:${port}`)
+})
 module.exports = app;
