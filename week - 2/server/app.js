@@ -28,42 +28,15 @@ app.set("view engine", "jade");
 function auth(req, res, next) {
   console.log(req.session);
 
-  if (!req.session.user) {
-    var authHeader = req.headers.authorization;
-    if (!authHeader) {
-      var err = new Error("You are not authenticated!");
-      res.setHeader("WWW-Authenticate", "Basic");
-      err.status = 401;
-      next(err);
-      return;
-    }
-    var auth = new Buffer.from(authHeader.split(" ")[1], "base64")
-      .toString()
-      .split(":");
-    var user = auth[0];
-    var pass = auth[1];
-    if (user == "admin" && pass == "password") {
-      res.status = 200;
-      req.session.user = "admin";
-      req.session.pass = "password";
-      next(); // authorized
-    } else {
-      var err = new Error("You are not authenticated!");
-      res.setHeader("WWW-Authenticate", "Basic");
-      err.status = 401;
-      next(err);
-    }
+  if (!req.session.username) {
+    var err = new Error("You are not authenticated!");
+    err.status = 401;
+    next(err);
+    return;
   } else {
-    var user = req.session.user;
-    var pass = req.session.pass;
-    if (user == "admin" && pass == "password") {
-      next(); // authorized
-    } else {
-      var err = new Error("You are not authenticated!");
-      res.setHeader("WWW-Authenticate", "Basic");
-      err.status = 401;
-      next(err);
-    }
+    // session is present for the user
+    res.statusCode = 200;
+    next()
   }
 }
 app.use(logger("dev"));
@@ -77,7 +50,7 @@ app.use(
     saveUninitialized: false,
     resave: false,
     store: new FileStore(),
-    unset:false
+    unset: false,
   })
 );
 
