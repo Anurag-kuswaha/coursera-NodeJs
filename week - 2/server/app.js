@@ -1,5 +1,6 @@
 var createError = require("http-errors");
 var express = require("express");
+var passport = require('passport');
 var path = require("path");
 var session = require("express-session");
 var FileStore = require("session-file-store")(session);
@@ -26,9 +27,9 @@ var app = express();
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
 function auth(req, res, next) {
-  console.log(req.session);
-
-  if (!req.session.username) {
+  console.log(req.user);
+console.log('rached at the auth function');
+  if (!req.user) {
     var err = new Error("You are not authenticated!");
     err.status = 401;
     next(err);
@@ -53,7 +54,8 @@ app.use(
     unset: false,
   })
 );
-
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
